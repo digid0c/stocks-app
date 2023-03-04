@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  db:
+    image: postgres:15.2
+    container_name: stocks-db
+    restart: always
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    volumes:
+      - ./src/main/resources/db/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: stocks
+      POSTGRES_USER: shares
+      POSTGRES_PASSWORD: money
+  app:
+    build: .
+    container_name: stocks-app
+    ports:
+      - "8085:8085"
+    expose:
+      - "8085"
+    depends_on:
+      - db
+    environment:
+      POSTGRES_HOST: jdbc:postgresql://db:5432/stocks
+      POSTGRES_USER: shares
+      POSTGRES_PASSWORD: money
+volumes:
+  postgres_data:

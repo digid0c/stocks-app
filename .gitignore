@@ -1,0 +1,13 @@
+.idea/
+.checkstyle
+.classpath
+.project
+.settings/
+*.iml
+*.iws
+*.ids
+*.bat
+.factorypath
+target/
+log/
+dependency-reduced-pom.xml
