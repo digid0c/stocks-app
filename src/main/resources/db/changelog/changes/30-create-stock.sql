@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS stock CASCADE;
 
 CREATE TABLE stock
 (
+    id            BIGSERIAL      PRIMARY KEY,
     employee_id   BIGINT         NOT NULL,
     share_id      BIGINT         NOT NULL,
     price_eur     NUMERIC(8,2)   NOT NULL,
