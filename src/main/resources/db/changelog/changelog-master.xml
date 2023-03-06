@@ -7,5 +7,6 @@
     <include file="/db/changelog/changes/10-create-employee.sql"/>
     <include file="/db/changelog/changes/20-create-share.sql"/>
     <include file="/db/changelog/changes/30-create-stock.sql"/>
+    <include file="/db/changelog/changes/40-populate-test-data.sql"/>
 
 </databaseChangeLog>

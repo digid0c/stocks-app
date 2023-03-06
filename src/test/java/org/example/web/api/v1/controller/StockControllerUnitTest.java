@@ -1,11 +1,7 @@
 package org.example.web.api.v1.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.util.Lists;
 import org.example.service.StockService;
-import org.example.web.api.v1.model.StockRegistrationModel;
 import org.example.web.api.v1.model.StockRegistrationModelList;
 import org.example.web.exception.RestExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +23,8 @@ import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static java.util.stream.Collectors.toList;
 import static org.example.web.WebConstants.V1_ENDPOINTS_URI;
+import static org.example.web.api.v1.controller.ControllerTestHelper.asJsonString;
+import static org.example.web.api.v1.controller.ControllerTestHelper.createModel;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -56,16 +54,12 @@ public class StockControllerUnitTest {
     private StockController tested;
 
     private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setUp() {
         mockMvc = standaloneSetup(tested)
                 .setControllerAdvice(new RestExceptionHandler(messageSource))
                 .build();
-
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -124,7 +118,7 @@ public class StockControllerUnitTest {
     public void shouldNotRegisterStockInCaseOfNullParameters() throws Exception {
         // given
         StockRegistrationModelList modelList = new StockRegistrationModelList();
-        modelList.setStocks(List.of(createModel(null, null, null, null, null)));
+        modelList.setStocks(List.of(createModel(1L, null, null, null, null)));
         shouldNotRegisterStocks(modelList);
     }
 
@@ -176,26 +170,5 @@ public class StockControllerUnitTest {
 
         // then
         verify(stockService, never()).register(any(StockRegistrationModelList.class));
-    }
-
-    private StockRegistrationModel createModel(Long employeeId, Long shareId, BigDecimal priceEur, Integer volume,
-                                               LocalDate registrationDate) {
-        StockRegistrationModel model = new StockRegistrationModel();
-
-        model.setEmployeeId(employeeId);
-        model.setShareId(shareId);
-        model.setPriceEur(priceEur);
-        model.setVolume(volume);
-        model.setRegistrationDate(registrationDate);
-
-        return model;
-    }
-
-    private String asJsonString(final Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

@@ -1,11 +1,7 @@
 package org.example.web.api.v1.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.assertj.core.util.Lists;
 import org.example.service.ShareService;
-import org.example.web.api.v1.model.ShareRegistrationModel;
 import org.example.web.api.v1.model.ShareRegistrationModelList;
 import org.example.web.exception.RestExceptionHandler;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +19,8 @@ import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 import static org.example.web.WebConstants.V1_ENDPOINTS_URI;
+import static org.example.web.api.v1.controller.ControllerTestHelper.asJsonString;
+import static org.example.web.api.v1.controller.ControllerTestHelper.createModel;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -55,16 +53,12 @@ public class ShareControllerUnitTest {
     private ShareController tested;
 
     private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
 
     @BeforeEach
     public void setUp() {
         mockMvc = standaloneSetup(tested)
                 .setControllerAdvice(new RestExceptionHandler(messageSource))
                 .build();
-
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
     }
 
     @Test
@@ -123,7 +117,7 @@ public class ShareControllerUnitTest {
     public void shouldNotRegisterShareInCaseOfNullParameters() throws Exception {
         // given
         ShareRegistrationModelList modelList = new ShareRegistrationModelList();
-        modelList.setShares(List.of(createModel(null, null, null, null, null)));
+        modelList.setShares(List.of(createModel("", null, null, null, null)));
         shouldNotRegisterShares(modelList);
     }
 
@@ -173,26 +167,5 @@ public class ShareControllerUnitTest {
 
         // then
         verify(shareService, never()).register(any(ShareRegistrationModelList.class));
-    }
-
-    private ShareRegistrationModel createModel(String companyName, String name, String isinCode, String countryCode,
-                                               String activityField) {
-        ShareRegistrationModel model = new ShareRegistrationModel();
-
-        model.setCompanyName(companyName);
-        model.setName(name);
-        model.setIsinCode(isinCode);
-        model.setCountryCode(countryCode);
-        model.setActivityField(activityField);
-
-        return model;
-    }
-
-    private String asJsonString(final Object object) {
-        try {
-            return objectMapper.writeValueAsString(object);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 }
