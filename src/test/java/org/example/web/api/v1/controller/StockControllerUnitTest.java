@@ -19,6 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.IntStream;
 
+import static java.lang.Integer.parseInt;
 import static java.math.BigDecimal.valueOf;
 import static java.time.LocalDate.of;
 import static java.util.stream.Collectors.toList;
@@ -29,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standaloneSetup;
@@ -43,6 +45,8 @@ public class StockControllerUnitTest {
     private static final BigDecimal VALID_PRICE_EUR = valueOf(25.50);
     private static final Integer VALID_VOLUME = 10;
     private static final LocalDate VALID_REGISTRATION_DATE = of(2023, 3, 5);
+    private static final String MONTH = "1";
+    private static final String YEAR = "2023";
 
     @Mock
     private StockService stockService;
@@ -157,6 +161,56 @@ public class StockControllerUnitTest {
                         i == 2 ? null : VALID_REGISTRATION_DATE))
                 .collect(toList()));
         shouldNotRegisterStocks(modelList);
+    }
+
+    @Test
+    public void shouldSuccessfullyRetrieveAcquiredSharesForSpecifiedEmployee() throws Exception {
+        // when
+        mockMvc.perform(get(TEST_URI + "/" + VALID_EMPLOYEE_ID)
+                        .accept(APPLICATION_JSON)
+                        .queryParam("month", MONTH)
+                        .queryParam("year", YEAR))
+                .andExpect(status().isOk());
+
+        // then
+        verify(stockService).getAcquiredShares(VALID_EMPLOYEE_ID, parseInt(MONTH), parseInt(YEAR));
+    }
+
+    @Test
+    public void shouldSuccessfullyRetrieveAcquiredSharesForAllEmployees() throws Exception {
+        // when
+        mockMvc.perform(get(TEST_URI + "/")
+                        .accept(APPLICATION_JSON)
+                        .queryParam("month", MONTH)
+                        .queryParam("year", YEAR))
+                .andExpect(status().isOk());
+
+        // then
+        verify(stockService).getAcquiredShares(null, parseInt(MONTH), parseInt(YEAR));
+    }
+
+    @Test
+    public void shouldSuccessfullyRetrieveTotalSpentAmountsForSpecifiedEmployee() throws Exception {
+        // when
+        mockMvc.perform(get(TEST_URI + "/amounts/" + VALID_EMPLOYEE_ID)
+                        .accept(APPLICATION_JSON)
+                        .queryParam("year", YEAR))
+                .andExpect(status().isOk());
+
+        // then
+        verify(stockService).getTotalSpentAmounts(VALID_EMPLOYEE_ID, parseInt(YEAR));
+    }
+
+    @Test
+    public void shouldSuccessfullyRetrieveTotalSpentAmountsForAllEmployees() throws Exception {
+        // when
+        mockMvc.perform(get(TEST_URI + "/amounts")
+                        .accept(APPLICATION_JSON)
+                        .queryParam("year", YEAR))
+                .andExpect(status().isOk());
+
+        // then
+        verify(stockService).getTotalSpentAmounts(null, parseInt(YEAR));
     }
 
     private void shouldNotRegisterStocks(StockRegistrationModelList modelList) throws Exception {

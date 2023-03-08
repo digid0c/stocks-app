@@ -8,5 +8,8 @@
     <include file="/db/changelog/changes/20-create-share.sql"/>
     <include file="/db/changelog/changes/30-create-stock.sql"/>
     <include file="/db/changelog/changes/40-populate-test-data.sql"/>
+    <include file="/db/changelog/changes/50-create-acquired-shares-view.sql"/>
+    <include file="/db/changelog/changes/60-create-total-spent-amount-view.sql"/>
+    <include file="/db/changelog/changes/70-create-stock-statistics-view.sql"/>
 
 </databaseChangeLog>
